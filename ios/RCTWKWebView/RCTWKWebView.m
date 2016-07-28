@@ -77,15 +77,13 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   }
 }
 
-- (void)setSource:(NSDictionary *)source
+- (void)didSetProps:(NSArray<NSString *> *)changedProps
 {
-  if (![_source isEqualToDictionary:source]) {
-    _source = [source copy];
-
+  if ([changedProps containsObject: @"source"]) {
     // Check for a static html source first
-    NSString *html = [RCTConvert NSString:source[@"html"]];
+    NSString *html = [RCTConvert NSString:_source[@"html"]];
     if (html) {
-      NSURL *baseURL = [RCTConvert NSURL:source[@"baseUrl"]];
+      NSURL *baseURL = [RCTConvert NSURL:_source[@"baseUrl"]];
       if (!baseURL) {
         baseURL = [NSURL URLWithString:@"about:blank"];
       }
@@ -93,7 +91,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
       return;
     }
 
-    NSURLRequest *request = [RCTConvert NSURLRequest:source];
+    NSURLRequest *request = [RCTConvert NSURLRequest:_source];
     // Because of the way React works, as pages redirect, we actually end up
     // passing the redirect urls back here, so we ignore them if trying to load
     // the same url. We'll expose a call to 'reload' to allow a user to load
@@ -108,6 +106,11 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
     }
     [self loadRequest:request];
   }
+}
+
+- (void)setSource:(NSDictionary *)source
+{
+  _source = [source copy];
 }
 
 - (void)layoutSubviews
